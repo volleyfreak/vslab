@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 // Check this to do the real implementation https://spring.io/guides/tutorials/rest/
 @Controller // This means that this class is a Controller
 @RequestMapping(path="/")
@@ -31,11 +34,39 @@ public class ProductController {
                                                                      Double searchMinPrice, Double searchMaxPrice) {
         Iterable<Product> products = productRepository.findAll();
         //todo: filter
-        return products;
+        ArrayList<Product> result = new ArrayList<>();
+        for (Product product: products){
+            if (searchDescription != null){
+                if (product.getName().contains(searchDescription)){
+                    result.add(product);
+                }
+                else{
+                    continue;
+                }
+            }
+            if (searchMinPrice != null){
+                if (product.getPrice() >= searchMinPrice ){
+                    result.add(product);
+                }
+                else {
+                    continue;
+                }
+            }
+            if (searchMaxPrice != null){
+                if (product.getPrice() <= searchMaxPrice ){
+                    result.add(product);
+                }
+                else {
+                    continue;
+                }
+            }
+
+        }
+        return result;
     }
 
     @DeleteMapping(path="product")
-    public @ResponseBody String getAllCategories(@RequestBody Product product) {
+    public @ResponseBody String DeleteProduct(@RequestBody Product product) {
         productRepository.delete(product);
         return "Deleted";
     }
