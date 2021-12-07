@@ -8,7 +8,7 @@ services:
       local_dev_net:
         aliases:
           - legacywebshop
-  categoryservice:
+  category:
     image: volleyfreak/vslab-category-service
     ports:
       - "8080:8080"
@@ -19,8 +19,8 @@ services:
     networks:
       local_dev_net:
         aliases:
-          - categoryservice
-  productservice:
+          - category
+  product:
     image: volleyfreak/vslab-product-service
     ports:
       - "8081:8080"
@@ -31,7 +31,7 @@ services:
     networks:
       local_dev_net:
         aliases:
-          - productservice
+          - product
   web-shop-db-image:
     image: mavogel/hska-vis-web-shop-db-image
     volumes:

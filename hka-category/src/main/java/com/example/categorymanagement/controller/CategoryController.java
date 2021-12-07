@@ -5,6 +5,8 @@ import com.example.categorymanagement.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 // Check this to do the real implementation https://spring.io/guides/tutorials/rest/
 @Controller // This means that this class is a Controller
@@ -28,10 +30,27 @@ public class CategoryController {
         // This returns a JSON or XML with the users
         return categoryRepository.findAll();
     }
+//    @PutMapping("/categories/{id}")
+//    public Category replaceCategory(@RequestBody Category newCategory, @PathVariable int id) {
+//
+//        return repository.findById(id)
+//                .map(category -> {
+//                    category.setName(newCategory.getName());
+//                    return repository.save(category);
+//                })
+//                .orElseGet(() -> {
+//                    newCategory.setId(id);
+//                    return repository.save(newCategory);
+//                });
+//    }
 
     @DeleteMapping(path="categories")
     public @ResponseBody String DeleteCategory(@RequestBody Category category) {
-        // This returns a JSON or XML with the users
+        try {
+            new RestTemplate().delete("http://product:8080/category/{id}", category.getId());
+        } catch (RestClientException e) {
+            System.out.println(e.getMessage());
+        }
         categoryRepository.delete(category);
         return "Deleted";
     }

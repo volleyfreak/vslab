@@ -1,10 +1,19 @@
 package com.example.productmanagement.controller;
 
+import java.util.Collection;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 import com.example.productmanagement.model.Product;
 import com.example.productmanagement.repository.ProductRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,12 +37,12 @@ public class ProductController {
     public @ResponseBody Iterable<Product> getProducts() {
         return productRepository.findAll();
     }
+    //todo: getmapping auf selben endpoint
 
     @GetMapping(path="productsearch")
     public @ResponseBody Iterable<Product> getProductforSearchValues(String searchDescription,
                                                                      Double searchMinPrice, Double searchMaxPrice) {
         Iterable<Product> products = productRepository.findAll();
-        //todo: filter
         ArrayList<Product> result = new ArrayList<>();
         for (Product product: products){
             if (searchDescription != null){
@@ -69,5 +78,21 @@ public class ProductController {
     public @ResponseBody String DeleteProduct(@RequestBody Product product) {
         productRepository.delete(product);
         return "Deleted";
+    }
+
+    @DeleteMapping(path="category/{id}")
+    public @ResponseBody ResponseEntity<Integer> deleteProductsByCategoryId(@PathVariable int id) {
+        Iterable<Product> products = productRepository.findAll();
+        Stream<Product> stream = StreamSupport.stream(products.spliterator(), false);
+        Predicate<Product> categoryPredicate = prod -> prod.getCategoryID() == id;
+        Collection<Product> productList = stream.filter(categoryPredicate).collect(Collectors.toList());
+
+        try {
+            productRepository.deleteAll(productList);
+        } catch(Exception e) {
+            return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(id, HttpStatus.OK);
     }
 }
