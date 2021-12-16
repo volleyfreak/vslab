@@ -1,5 +1,6 @@
 package com.example.productmanagement.controller;
 
+import java.net.InetAddress;
 import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -10,11 +11,13 @@ import com.example.productmanagement.model.Product;
 import com.example.productmanagement.repository.ProductRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -25,19 +28,36 @@ public class ProductController {
     @Autowired
     private ProductRepository productRepository;
 
-    @PostMapping(path="product") // Map ONLY POST Requests
-    public @ResponseBody String addNewProduct (@RequestBody Product product) {
+    @Autowired
+    Environment environment;
+
+    @PostMapping(path = "product") // Map ONLY POST Requests
+    public @ResponseBody
+    String addNewProduct(@RequestBody Product product) {
         // @ResponseBody means the returned String is the response, not a view name
         // @RequestParam means it is a parameter from the GET or POST request
         productRepository.save(product);
         return "Saved";
     }
 
-    @GetMapping(path="product")
-    public @ResponseBody Iterable<Product> getProducts() {
+    @GetMapping(path = "product")
+    public @ResponseBody
+    Iterable<Product> getProducts() {
         return productRepository.findAll();
     }
     //todo: getmapping auf selben endpoint
+
+
+    @GetMapping(path="ip")
+    public @ResponseBody String getIp() {
+        try{
+            return InetAddress.getLocalHost().getHostAddress();
+        }
+        catch (Exception e){
+            return "localhost not available";
+        }
+
+    }
 
     @GetMapping(path="productsearch")
     public @ResponseBody Iterable<Product> getProductforSearchValues(String searchDescription,

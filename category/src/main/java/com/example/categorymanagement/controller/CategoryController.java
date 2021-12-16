@@ -30,19 +30,6 @@ public class CategoryController {
         // This returns a JSON or XML with the users
         return categoryRepository.findAll();
     }
-//    @PutMapping("/categories/{id}")
-//    public Category replaceCategory(@RequestBody Category newCategory, @PathVariable int id) {
-//
-//        return repository.findById(id)
-//                .map(category -> {
-//                    category.setName(newCategory.getName());
-//                    return repository.save(category);
-//                })
-//                .orElseGet(() -> {
-//                    newCategory.setId(id);
-//                    return repository.save(newCategory);
-//                });
-//    }
 
     @DeleteMapping(path="categories")
     public @ResponseBody String DeleteCategory(@RequestBody Category category) {
