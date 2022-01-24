@@ -91,6 +91,38 @@ status: {}
 
 ---
 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    run: eshop
+  name: eshop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: eshop
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: eshop
+    spec:
+      containers:
+        - image: docker.io/volleyfreak/vslab-legacy-shop:latest
+          name: eshop
+          ports:
+            - containerPort: 8080
+          resources: {}
+          env:
+            - name: MYSQL_HOST
+              value: "mysql"
+status: {}
+
+---
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -148,6 +180,25 @@ spec:
   type: LoadBalancer
 status:
   loadBalancer: {}
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    run: eshop
+  name: eshop
+spec:
+  ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    run: eshop
+  type: LoadBalancer
+status:
+  loadBalancer: {}
 
 ---
 
@@ -180,12 +231,17 @@ spec:
         app: mysql
     spec:
       containers:
-        - image: mysql:5.6
+        - image: mavogel/hska-vis-web-shop-db-image
           name: mysql
           env:
-            # Use secret in real usage
             - name: MYSQL_ROOT_PASSWORD
-              value: password
+              value: c8de110f37300a53a971749
+            - name: MYSQL_DATABASE
+              value: webshop
+            - name: MYSQL_USER
+              value: webshopuser
+            - name: MYSQL_PASSWORD
+              value: 240b2c6d58ff2ce2f508b49f
           ports:
             - containerPort: 3306
               name: mysql
@@ -210,6 +266,49 @@ metadata:
   name: mysql-initdb-config
 data:
   initdb.sql: |
+    CREATE TABLE category (
+    	id INT NOT NULL AUTO_INCREMENT,
+    	name VARCHAR(255) NOT NULL,
+    	PRIMARY KEY (id)
+    ) ENGINE=InnoDB;
+
+    CREATE TABLE role (
+    	id INT NOT NULL AUTO_INCREMENT,
+    	level1 INT,
+    	type VARCHAR(255),
+    	PRIMARY KEY (id)
+    ) ENGINE=InnoDB;
+
+    CREATE TABLE product (
+    	id INT NOT NULL AUTO_INCREMENT,
+    	details VARCHAR(255),
+    	name VARCHAR(255),
+    	price DOUBLE,
+    	category_id INT,
+    	PRIMARY KEY (id)
+    ) ENGINE=InnoDB;
+
+    CREATE TABLE customer (
+    	id INT NOT NULL AUTO_INCREMENT,
+    	name VARCHAR(255) NOT NULL,
+    	lastname VARCHAR(255) NOT NULL,
+    	password VARCHAR(255) NOT NULL,
+    	username VARCHAR(255) NOT NULL,
+    	role INT NOT NULL,
+    	PRIMARY KEY (id)
+    ) ENGINE=InnoDB;
+
+    CREATE UNIQUE INDEX UK_mufchskagt7e1w4ksmt9lum5l ON customer (username ASC);
+
+    CREATE INDEX FK74aoh99stptslhotgf41fitt0 ON customer (role ASC);
+
+    CREATE INDEX FK1mtsbur82frn64de7balymq9s ON product (category_id ASC);
+
+    insert into `role` (`level1`, `type`) values(0, 'admin');
+    insert into `role` (`level1`, `type`) values(1, 'user');
+
+    insert into `customer` (`name`, `lastname`, `password`, `username`, `role`) values('admin', 'admin', 'admin', 'admin', 1);
+
     CREATE DATABASE IF NOT EXISTS `products`;
     CREATE DATABASE IF NOT EXISTS `categories`;
     CREATE USER 'user'@'%' IDENTIFIED BY 'user';

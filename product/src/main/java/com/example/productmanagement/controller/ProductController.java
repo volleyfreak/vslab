@@ -2,13 +2,16 @@ package com.example.productmanagement.controller;
 
 import java.net.InetAddress;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.example.productmanagement.model.Category;
 import com.example.productmanagement.model.Product;
 import com.example.productmanagement.repository.ProductRepository;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -16,6 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -36,8 +41,23 @@ public class ProductController {
     String addNewProduct(@RequestBody Product product) {
         // @ResponseBody means the returned String is the response, not a view name
         // @RequestParam means it is a parameter from the GET or POST request
-        productRepository.save(product);
-        return "Saved";
+        try {
+            ResponseEntity<Category[]> categories = new RestTemplate().getForEntity("http://category:8080/category", Category[].class );
+            Category[] categoryIter = categories.getBody();
+            ArrayList<Category> result = new ArrayList<>();
+            for (Category category: categoryIter){
+                    if (product.getName().equals(product.getCategoryName())){
+                        result.add(category);
+                    }
+                }
+            if (!result.isEmpty()){
+                productRepository.save(product);
+                return "Saved";
+            }
+        } catch (RestClientException e) {
+            System.out.println(e.getMessage());
+        }
+        return "Error";
     }
 
     @GetMapping(path = "product")
@@ -51,6 +71,7 @@ public class ProductController {
     @GetMapping(path="ip")
     public @ResponseBody String getIp() {
         try{
+            Iterable<Product> products = productRepository.findAll();
             return InetAddress.getLocalHost().getHostAddress();
         }
         catch (Exception e){
@@ -59,7 +80,7 @@ public class ProductController {
 
     }
 
-    @GetMapping(path="productsearch")
+    @GetMapping(path="product/search")
     public @ResponseBody Iterable<Product> getProductforSearchValues(String searchDescription,
                                                                      Double searchMinPrice, Double searchMaxPrice) {
         Iterable<Product> products = productRepository.findAll();
@@ -100,19 +121,19 @@ public class ProductController {
         return "Deleted";
     }
 
-    @DeleteMapping(path="category/{id}")
-    public @ResponseBody ResponseEntity<Integer> deleteProductsByCategoryId(@PathVariable int id) {
+    @DeleteMapping(path="category/{name}")
+    public @ResponseBody ResponseEntity<String> deleteProductsByCategoryName(@PathVariable String name) {
         Iterable<Product> products = productRepository.findAll();
         Stream<Product> stream = StreamSupport.stream(products.spliterator(), false);
-        Predicate<Product> categoryPredicate = prod -> prod.getCategoryID() == id;
+        Predicate<Product> categoryPredicate = prod -> prod.getCategoryName().equals(name);
         Collection<Product> productList = stream.filter(categoryPredicate).collect(Collectors.toList());
 
         try {
             productRepository.deleteAll(productList);
         } catch(Exception e) {
-            return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(name, HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(id, HttpStatus.OK);
+        return new ResponseEntity<>(name, HttpStatus.OK);
     }
 }

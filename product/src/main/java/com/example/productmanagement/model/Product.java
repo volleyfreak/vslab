@@ -25,9 +25,6 @@ public class Product implements java.io.Serializable {
     @Column(name = "price")
     private double price;
 
-    @Column(name = "categoryID")
-    private int categoryID;
-
     @Column(name = "categoryName")
     private String categoryName;
 
@@ -40,14 +37,12 @@ public class Product implements java.io.Serializable {
     public Product(String name, double price, int categoryID, String categoryName) {
         this.name = name;
         this.price = price;
-        this.categoryID = categoryID;
         this.categoryName = categoryName;
     }
 
     public Product(String name, double price, int categoryID, String categoryName, String details) {
         this.name = name;
         this.price = price;
-        this.categoryID = categoryID;
         this.categoryName = categoryName;
         this.details = details;
     }
@@ -75,10 +70,6 @@ public class Product implements java.io.Serializable {
     public void setPrice(double price) {
         this.price = price;
     }
-
-    public int getCategoryID() { return this.categoryID; }
-
-    public void setCategoryID(int categoryID) { this.categoryID = categoryID; }
 
     public String getCategoryName() { return this.categoryName; }
 

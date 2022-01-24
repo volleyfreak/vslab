@@ -1,11 +1,9 @@
-package com.example.categorymanagement.model;
+package com.example.productmanagement.model;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity // This tells Hibernate to make a table out of this class
 public class Category {
