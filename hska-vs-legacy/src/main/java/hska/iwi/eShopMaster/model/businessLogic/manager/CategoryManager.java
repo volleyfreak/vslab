@@ -16,7 +16,7 @@ public interface CategoryManager {
 	
 	public void delCategory(Category cat);
 	
-	public void delCategoryByName(String name);
+	public void delCategoryById(int id);
 
 	
 }

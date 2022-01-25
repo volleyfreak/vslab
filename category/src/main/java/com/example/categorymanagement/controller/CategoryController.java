@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpStatus;
 
 // Check this to do the real implementation https://spring.io/guides/tutorials/rest/
 @Controller // This means that this class is a Controller
@@ -19,32 +20,28 @@ public class CategoryController {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @PostMapping(path="categories") // Map ONLY POST Requests
-    public @ResponseBody String addNewCategory (@RequestBody Category newCategory) {
+    @PostMapping(path="/categories") // Map ONLY POST Requests
+    @ResponseStatus(HttpStatus.CREATED)
+    public @ResponseBody Category addNewCategory (@RequestBody Category newCategory) {
         // @ResponseBody means the returned String is the response, not a view name
         // @RequestParam means it is a parameter from the GET or POST request
-        //Category category = new Category();
-        //category.setName(name);
-        categoryRepository.save(newCategory);
-        return "Saved";
+        return categoryRepository.save(newCategory);
     }
 
-    @GetMapping(path="categories")
+    @GetMapping(path="/categories")
     public @ResponseBody Iterable<Category> getAllCategories() {
         // This returns a JSON or XML with the users
         return categoryRepository.findAll();
     }
 
-    @DeleteMapping(path="categories")
-    public @ResponseBody String DeleteCategory(@RequestBody Category category) {
+    @DeleteMapping(path="/categories/{id}")
+    public void deleteCategory(@PathVariable int id) {
         try {
-            new RestTemplate().delete("http://product:8082/categories/{name}", category.getName());
-            categoryRepository.delete(category);
-            return "Deleted";
+            //new RestTemplate().delete("http://product:8082//categories/{id}", id);
+
         } catch (RestClientException e) {
             System.out.println(e.getMessage());
-            return "Error";
         }
-
+        categoryRepository.deleteById(id);
     }
 }

@@ -36,29 +36,44 @@ public class ProductController {
     @Autowired
     Environment environment;
 
-    @PostMapping(path = "product") // Map ONLY POST Requests
-    public @ResponseBody
-    String addNewProduct(@RequestBody Product product) {
-        // @ResponseBody means the returned String is the response, not a view name
-        // @RequestParam means it is a parameter from the GET or POST request
+
+    @PostMapping(path="products") // Map ONLY POST Requests
+    public @ResponseBody ResponseEntity<Product> addNewProduct (@RequestBody Product newProduct) {
         try {
-            ResponseEntity<Category[]> categories = new RestTemplate().getForEntity("http://category:8081/categories", Category[].class );
-            Category[] categoryIter = categories.getBody();
-            ArrayList<Category> result = new ArrayList<>();
-            for (Category category: categoryIter){
-                    if (product.getName().equals(product.getCategoryName())){
-                        result.add(category);
-                    }
-                }
-            if (!result.isEmpty()){
-                productRepository.save(product);
-                return "Saved";
-            }
-        } catch (RestClientException e) {
+            System.out.println("Test");
+            //new RestTemplate().getForObject("http://category:8080//categories/{id}", Object.class, newProduct.getCategoryId());
+        } catch (Exception e) {
             System.out.println(e.getMessage());
+            return new ResponseEntity<>(newProduct, HttpStatus.NOT_FOUND);
         }
-        return "Error";
+        Product prod =  productRepository.save(newProduct);
+        return new ResponseEntity<>(prod, HttpStatus.OK);
     }
+
+
+//    @PostMapping(path = "product") // Map ONLY POST Requests
+//    public @ResponseBody
+//    String addNewProduct(@RequestBody Product product) {
+//        // @ResponseBody means the returned String is the response, not a view name
+//        // @RequestParam means it is a parameter from the GET or POST request
+//        try {
+//            ResponseEntity<Category[]> categories = new RestTemplate().getForEntity("http://category:8081/categories", Category[].class );
+//            Category[] categoryIter = categories.getBody();
+//            ArrayList<Category> result = new ArrayList<>();
+//            for (Category category: categoryIter){
+//                    if (product.getName().equals(product.getCategoryName())){
+//                        result.add(category);
+//                    }
+//                }
+//            if (!result.isEmpty()){
+//                productRepository.save(product);
+//                return "Saved";
+//            }
+//        } catch (RestClientException e) {
+//            System.out.println(e.getMessage());
+//        }
+//        return "Error";
+//    }
 
     @GetMapping(path = "product")
     public @ResponseBody
@@ -81,7 +96,7 @@ public class ProductController {
     }
 
     @GetMapping(path="product/search")
-    public @ResponseBody Iterable<Product> getProductforSearchValues(String searchDescription,
+    public @ResponseBody ResponseEntity<Iterable<Product>> getProductforSearchValues(String searchDescription,
                                                                      Double searchMinPrice, Double searchMaxPrice) {
         Iterable<Product> products = productRepository.findAll();
         ArrayList<Product> result = new ArrayList<>();
@@ -112,7 +127,7 @@ public class ProductController {
             }
 
         }
-        return result;
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @DeleteMapping(path="product")
@@ -121,19 +136,19 @@ public class ProductController {
         return "Deleted";
     }
 
-    @DeleteMapping(path="categories/{name}")
-    public @ResponseBody ResponseEntity<String> deleteProductsByCategoryName(@PathVariable String name) {
+    @DeleteMapping(path="categories/{id}")
+    public @ResponseBody ResponseEntity<Integer> deleteProductsByCategoryId(@PathVariable int id) {
         Iterable<Product> products = productRepository.findAll();
         Stream<Product> stream = StreamSupport.stream(products.spliterator(), false);
-        Predicate<Product> categoryPredicate = prod -> prod.getCategoryName().equals(name);
+        Predicate<Product> categoryPredicate = prod -> prod.getCategoryId() == id;
         Collection<Product> productList = stream.filter(categoryPredicate).collect(Collectors.toList());
 
         try {
             productRepository.deleteAll(productList);
         } catch(Exception e) {
-            return new ResponseEntity<>(name, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(id, HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(name, HttpStatus.OK);
+        return new ResponseEntity<>(id, HttpStatus.OK);
     }
 }

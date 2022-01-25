@@ -30,10 +30,10 @@ public class CategoryMicroserviceAdapter implements CategoryManager {
     }
 
     public void delCategory(Category cat) {
-        new RestTemplate().delete("http://category:8081/categories/{name}", cat.getName());
+        new RestTemplate().delete("http://category:8081/categories/{id}", cat.getId());
     }
 
-    public void delCategoryByName(String name) {
-        new RestTemplate().delete("http://category:8081/categories/{name}", name);
+    public void delCategoryById(int id) {
+        new RestTemplate().delete("http://category:8081/categories/{id}", id);
     }
 }

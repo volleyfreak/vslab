@@ -28,7 +28,7 @@ public class ProductMicroserviceAdapter implements ProductManager {
         product.setPrice(price);
         product.setCategoryId(categoryId);
         product.setDetails(details);
-        Product result = new RestTemplate().postForObject("http://product:8082/product", product, Product.class);
+        Product result = new RestTemplate().postForObject("http://product:8082/products", product, Product.class);
         return result.getId();
     }
 
@@ -39,7 +39,7 @@ public class ProductMicroserviceAdapter implements ProductManager {
             searchMinPrice = Double.MIN_VALUE;
         if (searchValue == null)
             searchValue = "";
-        Product[] productArray = new RestTemplate().getForObject("http://product:8082/product?name=" + searchValue + "&min=" + Double.toString(searchMinPrice) + "&max=" + Double.toString(searchMaxPrice), Product[].class);
+        Product[] productArray = new RestTemplate().getForObject("http://product:8082/product/search?name=" + searchValue + "&min=" + Double.toString(searchMinPrice) + "&max=" + Double.toString(searchMaxPrice), Product[].class);
         return new ArrayList<Product>(Arrays.asList(productArray));
     }
 
