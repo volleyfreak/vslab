@@ -25,10 +25,8 @@ public class Product implements java.io.Serializable {
     @Column(name = "price")
     private double price;
 
-
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
+    @Column(name = "categoryName")
+    private String categoryName;
 
     @Column(name = "details")
     private String details;
@@ -36,16 +34,16 @@ public class Product implements java.io.Serializable {
     public Product() {
     }
 
-    public Product(String name, double price, Category category) {
+    public Product(String name, double price, int categoryID, String categoryName) {
         this.name = name;
         this.price = price;
-        this.category = category;
+        this.categoryName = categoryName;
     }
 
-    public Product(String name, double price, Category category, String details) {
+    public Product(String name, double price, int categoryID, String categoryName, String details) {
         this.name = name;
         this.price = price;
-        this.category = category;
+        this.categoryName = categoryName;
         this.details = details;
     }
 
@@ -73,13 +71,9 @@ public class Product implements java.io.Serializable {
         this.price = price;
     }
 
-    public Category getCategory() {
-        return this.category;
-    }
+    public String getCategoryName() { return this.categoryName; }
 
-    public void setCategory(Category category) {
-        this.category = category;
-    }
+    public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
 
     public String getDetails() {
         return this.details;
