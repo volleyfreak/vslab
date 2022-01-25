@@ -19,7 +19,7 @@ public class CategoryController {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @PostMapping(path="category") // Map ONLY POST Requests
+    @PostMapping(path="categories") // Map ONLY POST Requests
     public @ResponseBody String addNewCategory (@RequestBody Category newCategory) {
         // @ResponseBody means the returned String is the response, not a view name
         // @RequestParam means it is a parameter from the GET or POST request
@@ -29,16 +29,16 @@ public class CategoryController {
         return "Saved";
     }
 
-    @GetMapping(path="category")
+    @GetMapping(path="categories")
     public @ResponseBody Iterable<Category> getAllCategories() {
         // This returns a JSON or XML with the users
         return categoryRepository.findAll();
     }
 
-    @DeleteMapping(path="category")
+    @DeleteMapping(path="categories")
     public @ResponseBody String DeleteCategory(@RequestBody Category category) {
         try {
-            new RestTemplate().delete("http://product:8080/category/{name}", category.getName());
+            new RestTemplate().delete("http://product:8082/categories/{name}", category.getName());
             categoryRepository.delete(category);
             return "Deleted";
         } catch (RestClientException e) {

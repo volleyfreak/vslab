@@ -42,7 +42,7 @@ public class ProductController {
         // @ResponseBody means the returned String is the response, not a view name
         // @RequestParam means it is a parameter from the GET or POST request
         try {
-            ResponseEntity<Category[]> categories = new RestTemplate().getForEntity("http://category:8080/category", Category[].class );
+            ResponseEntity<Category[]> categories = new RestTemplate().getForEntity("http://category:8081/categories", Category[].class );
             Category[] categoryIter = categories.getBody();
             ArrayList<Category> result = new ArrayList<>();
             for (Category category: categoryIter){
@@ -121,7 +121,7 @@ public class ProductController {
         return "Deleted";
     }
 
-    @DeleteMapping(path="category/{name}")
+    @DeleteMapping(path="categories/{name}")
     public @ResponseBody ResponseEntity<String> deleteProductsByCategoryName(@PathVariable String name) {
         Iterable<Product> products = productRepository.findAll();
         Stream<Product> stream = StreamSupport.stream(products.spliterator(), false);
