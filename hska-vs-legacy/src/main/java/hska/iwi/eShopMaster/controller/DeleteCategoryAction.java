@@ -20,6 +20,7 @@ public class DeleteCategoryAction extends ActionSupport {
 	private static final long serialVersionUID = 1254575994729199914L;
 	
 	private int catId;
+	private String catName;
 	private List<Category> categories;
 
 	public String execute() throws Exception {
@@ -34,7 +35,7 @@ public class DeleteCategoryAction extends ActionSupport {
 			// Helper inserts new Category in DB:
 			CategoryManager categoryManager = new CategoryMicroserviceAdapter();
 		
-			categoryManager.delCategoryById(catId);
+			categoryManager.delCategoryByName(catName);
 
 			categories = categoryManager.getCategories();
 				
