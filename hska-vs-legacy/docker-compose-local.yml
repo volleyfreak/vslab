@@ -14,7 +14,7 @@ services:
   web-shop-db-image:
     build:
       context: ./
-      dockerfile: ./docker/DockerfileMySQL
+      dockerfile: DockerfileMySQL
     volumes:
       - "./.data/db:/var/lib/mysql"
     environment:

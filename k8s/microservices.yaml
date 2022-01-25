@@ -50,7 +50,7 @@ spec:
         - image: docker.io/volleyfreak/vslab-product-service:latest
           name: product
           ports:
-            - containerPort: 8080
+            - containerPort: 8082
           resources: {}
           env:
             - name: MYSQL_HOST
@@ -82,7 +82,7 @@ spec:
         - image: docker.io/volleyfreak/vslab-category-service:latest
           name: category
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
           resources: {}
           env:
             - name: MYSQL_HOST
@@ -152,9 +152,9 @@ metadata:
   name: product
 spec:
   ports:
-    - port: 8080
+    - port: 8082
       protocol: TCP
-      targetPort: 8080
+      targetPort: 8082
   selector:
     run: product
   type: LoadBalancer
@@ -172,9 +172,9 @@ metadata:
   name: category
 spec:
   ports:
-    - port: 8080
+    - port: 8081
       protocol: TCP
-      targetPort: 8080
+      targetPort: 8081
   selector:
     run: category
   type: LoadBalancer
