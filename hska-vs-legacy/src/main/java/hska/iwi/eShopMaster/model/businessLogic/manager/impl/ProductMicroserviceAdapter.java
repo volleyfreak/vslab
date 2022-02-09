@@ -10,16 +10,16 @@ import java.util.List;
 
 public class ProductMicroserviceAdapter implements ProductManager {
     public List<Product> getProducts() {
-        Product[] productArray = new RestTemplate().getForObject("http://product:8082/product", Product[].class);
+        Product[] productArray = new RestTemplate().getForObject("http://product:8082/products", Product[].class);
         return new ArrayList<Product>(Arrays.asList(productArray));
     }
 
     public Product getProductById(int id) {
-        return new RestTemplate().getForObject("http://product:8082/product/{id}", Product.class, id);
+        return new RestTemplate().getForObject("http://product:8082/products/{id}", Product.class, id);
     }
 
     public Product getProductByName(String name) {
-        return new RestTemplate().getForObject("http://product:8082/product/{name}", Product.class, name);
+        return new RestTemplate().getForObject("http://product:8082/products/{name}", Product.class, name);
     }
 
     public int addProduct(String name, double price, int categoryId, String details) {
@@ -39,7 +39,7 @@ public class ProductMicroserviceAdapter implements ProductManager {
             searchMinPrice = Double.MIN_VALUE;
         if (searchValue == null)
             searchValue = "";
-        Product[] productArray = new RestTemplate().getForObject("http://product:8082/product/search?name=" + searchValue + "&min=" + Double.toString(searchMinPrice) + "&max=" + Double.toString(searchMaxPrice), Product[].class);
+        Product[] productArray = new RestTemplate().getForObject("http://product:8082/products/search?searchDescription=" + searchValue + "&searchMinPrice=" + Double.toString(searchMinPrice) + "&searchMaxPrice=" + Double.toString(searchMaxPrice), Product[].class);
         return new ArrayList<Product>(Arrays.asList(productArray));
     }
 
@@ -49,6 +49,6 @@ public class ProductMicroserviceAdapter implements ProductManager {
     }
 
     public void deleteProductById(int id) {
-        new RestTemplate().delete("http://product:8082/categories/{id}", id);
+        new RestTemplate().delete("http://product:8082/products/{id}", id);
     }
 }

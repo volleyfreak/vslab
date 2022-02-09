@@ -6,57 +6,32 @@ import javax.persistence.*;
  * This class contains details about products.
  */
 @Entity
-@Table(name = "product")
 public class Product implements java.io.Serializable {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
 
-    @Column(name = "name")
     private String name;
 
-    @Column(name = "price")
     private double price;
 
-    @Column(name = "categoryId")
     private Integer categoryId;
 
-    @Column(name = "details")
+    private String categoryName;
+
     private String details;
 
-    public Product() {
+    public Integer getId() {
+        return id;
     }
 
-    public Product(String name, double price, int categoryId, String categoryName) {
-        this.name = name;
-        this.price = price;
-        this.categoryId = categoryId;
-    }
-
-    public Product(String name, double price, int categoryId, String categoryName, String details) {
-        this.name = name;
-        this.price = price;
-        this.categoryId = categoryId;
-        this.details = details;
-    }
-
-    public int getId() {
-        return this.id;
-    }
-
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public void setName(String name) {
@@ -64,23 +39,34 @@ public class Product implements java.io.Serializable {
     }
 
     public double getPrice() {
-        return this.price;
+        return price;
     }
 
     public void setPrice(double price) {
         this.price = price;
     }
 
-    public int getCategoryId() { return this.categoryId; }
+    public Integer getCategoryId() {
+        return categoryId;
+    }
 
-    public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
 
     public String getDetails() {
-        return this.details;
+        return details;
     }
 
     public void setDetails(String details) {
         this.details = details;
     }
 
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
 }
