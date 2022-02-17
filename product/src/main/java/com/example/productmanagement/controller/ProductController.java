@@ -103,7 +103,12 @@ public class ProductController {
         for (Product product: products){
             if (searchDescription != null){
                 if (product.getName().contains(searchDescription)){
-                    result.add(product);
+                    if (result.contains(product)){
+                        continue;
+                    }
+                    else {
+                        result.add(product);
+                    }
                 }
                 else{
                     continue;
@@ -111,7 +116,12 @@ public class ProductController {
             }
             if (searchMinPrice != null){
                 if (product.getPrice() >= searchMinPrice ){
-                    result.add(product);
+                    if (result.contains(product)) {
+                        continue;
+                    }
+                    else {
+                        result.add(product);
+                    }
                 }
                 else {
                     continue;
@@ -119,7 +129,12 @@ public class ProductController {
             }
             if (searchMaxPrice != null){
                 if (product.getPrice() <= searchMaxPrice ){
-                    result.add(product);
+                    if (result.contains(product)) {
+                        continue;
+                    }
+                    else {
+                        result.add(product);
+                    }
                 }
                 else {
                     continue;
