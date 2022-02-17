@@ -7,9 +7,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import java.util.Optional;
+import java.util.Arrays;
 
 import com.example.productmanagement.model.Category;
 import com.example.productmanagement.model.Product;
+import com.example.productmanagement.model.ProductObject;
 
 
 import com.example.productmanagement.repository.ProductRepository;
@@ -45,7 +48,7 @@ public class ProductController {
             System.out.println(e.getMessage());
             return new ResponseEntity<>(newProduct, HttpStatus.NOT_FOUND);
         }
-        newProduct.setCategoryName(category.getName());
+        newProduct.setCategoryId(category.getId());
         Product prod =  productRepository.save(newProduct);
         return new ResponseEntity<>(prod, HttpStatus.OK);
     }
@@ -76,12 +79,18 @@ public class ProductController {
 //    }
 
     @GetMapping(path = "products")
-    public @ResponseBody
-    Iterable<Product> getProducts() {
-        return productRepository.findAll();
+    public @ResponseBody Iterable<ProductObject> getProducts() {
+        Iterable<Product> products = productRepository.findAll();
+        return getFullProducts(products);
     }
     //todo: getmapping auf selben endpoint
-
+    @GetMapping(path="products/{id}")
+    public @ResponseBody ProductObject getProductById(@PathVariable int id) {
+        Optional<Product> product = productRepository.findById(id);
+        Product prod = product.get();
+        return getFullProduct(prod);
+        //if its not working getFullProduct must be used
+    }
 
     @GetMapping(path="ip")
     public @ResponseBody String getIp() {
@@ -173,5 +182,54 @@ public class ProductController {
         }
 
         return new ResponseEntity<>(id, HttpStatus.OK);
+    }
+
+    private ProductObject getFullProduct(Product product) {
+
+        ProductObject fullProduct;
+        int categoryId = product.getCategoryId();
+
+        final String uri = "http://category:8081//categories/";
+        Category category;
+
+        RestTemplate restTemplate = new RestTemplate();
+//        try {
+            category = restTemplate.getForObject(uri + categoryId, Category.class);
+//        } catch (Exception e) {
+//        }
+
+//        try {
+            fullProduct = new ProductObject(product.getId(), product.getName(), product.getPrice(), category, product.getDetails());
+//        } catch (Exception e) {
+//        }
+        return fullProduct;
+
+    }
+    private Collection<ProductObject> getFullProducts(Iterable<Product> products) {
+        Collection<ProductObject> fullProducts = new ArrayList<>();
+
+        final String uri = "http://category:8081//categories/";
+
+        RestTemplate restTemplate = new RestTemplate();
+        Category[] categories;
+
+        try {
+            categories = restTemplate.getForObject(uri, Category[].class);
+        } catch (Exception e) {
+            throw e;
+        }
+
+        List<Category> categories_list = Arrays.asList(categories);
+
+        products.forEach(product -> {
+            Predicate<Category> categoryIdPredicate = cat -> cat.getId() == product.getCategoryId();
+            try {
+                fullProducts.add(new ProductObject(product.getId(), product.getName(), product.getPrice(), categories_list.stream().filter(categoryIdPredicate).findFirst().get(), product.getDetails()));
+            } catch (Exception e) {
+            }
+        });
+
+        return fullProducts;
+
     }
 }
