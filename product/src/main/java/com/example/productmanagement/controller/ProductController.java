@@ -73,55 +73,79 @@ public class ProductController {
         }
 
     }
-    @GetMapping(path="products/search")
-    public @ResponseBody Iterable<ProductObject> getProductforSearchValues(String searchDescription,
-                                                        Double searchMinPrice, Double searchMaxPrice) {
-        Iterable<Product> products = productRepository.findAll();
-        ArrayList<Product> result = new ArrayList<>();
-        for (Product product: products){
-            if (searchDescription != null){
-                if (product.getName().contains(searchDescription)){
-                    if (result.contains(product)){
-                        continue;
-                    }
-                    else {
-                        result.add(product);
-                    }
-                }
-                else{
-                    continue;
-                }
-            }
-            if (searchMinPrice != null){
-                if (product.getPrice() >= searchMinPrice ){
-                    if (result.contains(product)) {
-                        continue;
-                    }
-                    else {
-                        result.add(product);
-                    }
-                }
-                else {
-                    continue;
-                }
-            }
-            if (searchMaxPrice != null){
-                if (product.getPrice() <= searchMaxPrice ){
-                    if (result.contains(product)) {
-                        continue;
-                    }
-                    else {
-                        result.add(product);
-                    }
-                }
-                else {
-                    continue;
-                }
-            }
 
+    @GetMapping(path="products/search")
+    public @ResponseBody Collection<ProductObject> getProductforSearchValues(String searchDescription, String searchMinPrice, String searchMaxPrice) {
+        Iterable<Product> products = productRepository.findAll();
+        Iterable<ProductObject> allProducts = getFullProducts(products);
+        Stream<ProductObject> stream = StreamSupport.stream(allProducts.spliterator(), false);
+        Predicate<ProductObject> minPricePredicate = prod -> prod.getPrice() >= Double.parseDouble(searchMinPrice);
+        Predicate<ProductObject> maxPricePredicate = prod -> prod.getPrice() <= Double.parseDouble(searchMaxPrice);
+        Predicate<ProductObject> descriptionPredicate = prod -> prod.getName().contains(searchDescription);
+        Collection<ProductObject> response = stream.collect(Collectors.toList());
+        if (searchMinPrice != null && !searchMinPrice.isEmpty()) {
+            response = response.stream().filter(minPricePredicate).collect(Collectors.toList());
         }
-        return getFullProducts(result);
+        if (searchMaxPrice != null && !searchMaxPrice.isEmpty()) {
+            response = response.stream().filter(maxPricePredicate).collect(Collectors.toList());
+        }
+        if (searchDescription != null && !searchDescription.isEmpty()) {
+            response = response.stream().filter(descriptionPredicate).collect(Collectors.toList());
+        }
+        return response;
+
     }
+
+//    @GetMapping(path="products/search")
+//    public @ResponseBody Iterable<ProductObject> getProductforSearchValues(String searchDescription,
+//                                                        Double searchMinPrice, Double searchMaxPrice) {
+//        Iterable<Product> products = productRepository.findAll();
+//        ArrayList<Product> result = new ArrayList<>();
+//        for (Product product: products){
+//            if (searchDescription != null){
+//                if (product.getName().contains(searchDescription)){
+//                    if (result.contains(product)){
+//                        continue;
+//                    }
+//                    else {
+//                        result.add(product);
+//                    }
+//                }
+//                else{
+//                    continue;
+//                }
+//            }
+//            if (searchMinPrice != null){
+//                if (product.getPrice() >= searchMinPrice ){
+//                    if (result.contains(product)) {
+//                        continue;
+//                    }
+//                    else {
+//                        result.add(product);
+//                    }
+//                }
+//                else {
+//                    continue;
+//                }
+//            }
+//            if (searchMaxPrice != null){
+//                if (product.getPrice() <= searchMaxPrice ){
+//                    if (result.contains(product)) {
+//                        continue;
+//                    }
+//                    else {
+//                        result.add(product);
+//                    }
+//                }
+//                else {
+//                    continue;
+//                }
+//            }
+//
+//        }
+//        return getFullProducts(result);
+//    }
+
 
     @DeleteMapping(path="products/{id}")
     public @ResponseBody ResponseEntity<Integer> deleteProductById(@PathVariable int id) {
