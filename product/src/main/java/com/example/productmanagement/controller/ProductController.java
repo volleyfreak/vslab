@@ -19,14 +19,11 @@ import com.example.productmanagement.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 // Check this to do the real implementation https://spring.io/guides/tutorials/rest/
 @RestController // This means that this class is a Controller
@@ -103,10 +100,9 @@ public class ProductController {
         }
 
     }
-    //todo: Hier kommen irgendwie 3 Produkte zurück??
     @GetMapping(path="products/search")
-    public @ResponseBody ResponseEntity<Iterable<Product>> getProductforSearchValues(String searchDescription,
-                                                                     Double searchMinPrice, Double searchMaxPrice) {
+    public @ResponseBody Iterable<ProductObject> getProductforSearchValues(String searchDescription,
+                                                        Double searchMinPrice, Double searchMaxPrice) {
         Iterable<Product> products = productRepository.findAll();
         ArrayList<Product> result = new ArrayList<>();
         for (Product product: products){
@@ -151,7 +147,7 @@ public class ProductController {
             }
 
         }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return getFullProducts(result);
     }
 
     @DeleteMapping(path="products/{id}")
@@ -199,12 +195,13 @@ public class ProductController {
 //        }
 
 //        try {
-            fullProduct = new ProductObject(product.getId(), product.getName(), product.getPrice(), category, product.getDetails());
+            fullProduct = new ProductObject(product.getId(), product.getName(), product.getPrice(), category, product.getDetails(), category.getName());
 //        } catch (Exception e) {
 //        }
         return fullProduct;
 
     }
+
     private Collection<ProductObject> getFullProducts(Iterable<Product> products) {
         Collection<ProductObject> fullProducts = new ArrayList<>();
 
@@ -224,7 +221,7 @@ public class ProductController {
         products.forEach(product -> {
             Predicate<Category> categoryIdPredicate = cat -> cat.getId() == product.getCategoryId();
             try {
-                fullProducts.add(new ProductObject(product.getId(), product.getName(), product.getPrice(), categories_list.stream().filter(categoryIdPredicate).findFirst().get(), product.getDetails()));
+                fullProducts.add(new ProductObject(product.getId(), product.getName(), product.getPrice(), categories_list.stream().filter(categoryIdPredicate).findFirst().get(), product.getDetails(), categories_list.stream().filter(categoryIdPredicate).findFirst().get().getName()));
             } catch (Exception e) {
             }
         });
