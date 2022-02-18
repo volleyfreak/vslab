@@ -50,43 +50,16 @@ public class ProductController {
         return new ResponseEntity<>(prod, HttpStatus.OK);
     }
 
-
-//    @PostMapping(path = "product") // Map ONLY POST Requests
-//    public @ResponseBody
-//    String addNewProduct(@RequestBody Product product) {
-//        // @ResponseBody means the returned String is the response, not a view name
-//        // @RequestParam means it is a parameter from the GET or POST request
-//        try {
-//            ResponseEntity<Category[]> categories = new RestTemplate().getForEntity("http://category:8081/categories", Category[].class );
-//            Category[] categoryIter = categories.getBody();
-//            ArrayList<Category> result = new ArrayList<>();
-//            for (Category category: categoryIter){
-//                    if (product.getName().equals(product.getCategoryName())){
-//                        result.add(category);
-//                    }
-//                }
-//            if (!result.isEmpty()){
-//                productRepository.save(product);
-//                return "Saved";
-//            }
-//        } catch (RestClientException e) {
-//            System.out.println(e.getMessage());
-//        }
-//        return "Error";
-//    }
-
     @GetMapping(path = "products")
     public @ResponseBody Iterable<ProductObject> getProducts() {
         Iterable<Product> products = productRepository.findAll();
         return getFullProducts(products);
     }
-    //todo: getmapping auf selben endpoint
     @GetMapping(path="products/{id}")
     public @ResponseBody ProductObject getProductById(@PathVariable int id) {
         Optional<Product> product = productRepository.findById(id);
         Product prod = product.get();
         return getFullProduct(prod);
-        //if its not working getFullProduct must be used
     }
 
     @GetMapping(path="ip")
@@ -189,15 +162,8 @@ public class ProductController {
         Category category;
 
         RestTemplate restTemplate = new RestTemplate();
-//        try {
-            category = restTemplate.getForObject(uri + categoryId, Category.class);
-//        } catch (Exception e) {
-//        }
-
-//        try {
-            fullProduct = new ProductObject(product.getId(), product.getName(), product.getPrice(), category, product.getDetails(), category.getName());
-//        } catch (Exception e) {
-//        }
+        category = restTemplate.getForObject(uri + categoryId, Category.class);
+        fullProduct = new ProductObject(product.getId(), product.getName(), product.getPrice(), category, product.getDetails(), category.getName());
         return fullProduct;
 
     }
